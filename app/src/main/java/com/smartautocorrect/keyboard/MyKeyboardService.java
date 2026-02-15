@@ -47,7 +47,7 @@ public class MyKeyboardService extends InputMethodService implements KeyboardVie
             case Keyboard.KEYCODE_DELETE:
                 CharSequence selectedText = ic.getSelectedText(0);
                 if (selectedText != null && selectedText.length() > 0) {
-                    ic.deleteSurroundingText(0, 0);
+                    ic.commitText("", 1);
                     wordBuffer.setLength(0);
                 } else {
                     ic.deleteSurroundingText(1, 0);
