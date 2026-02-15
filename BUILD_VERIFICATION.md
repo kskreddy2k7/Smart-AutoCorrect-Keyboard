@@ -67,8 +67,8 @@ cd SmartAutoCorrectKeyboard
 
 - Java Development Kit (JDK) 8 or higher
 - Android SDK API Level 21 or higher
-- Gradle 7.5 or higher
-- Android Gradle Plugin 7.4.2 or higher
+- Gradle 7.5 (as specified in gradle-wrapper.properties)
+- Android Gradle Plugin 7.4.2
 
 ## Compilation Verification
 
