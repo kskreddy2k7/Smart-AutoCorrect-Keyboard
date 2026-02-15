@@ -48,11 +48,12 @@ public class MyKeyboardService extends InputMethodService implements KeyboardVie
                 CharSequence selectedText = ic.getSelectedText(0);
                 if (selectedText != null && selectedText.length() > 0) {
                     ic.deleteSurroundingText(0, 0);
+                    wordBuffer.setLength(0);
                 } else {
                     ic.deleteSurroundingText(1, 0);
-                }
-                if (wordBuffer.length() > 0) {
-                    wordBuffer.deleteCharAt(wordBuffer.length() - 1);
+                    if (wordBuffer.length() > 0) {
+                        wordBuffer.deleteCharAt(wordBuffer.length() - 1);
+                    }
                 }
                 break;
             case Keyboard.KEYCODE_DONE:

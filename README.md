@@ -104,7 +104,7 @@ Or build from Android Studio: **Build → Make Project**
 ## Technical Details
 
 - **Minimum SDK**: 21 (Android 5.0 Lollipop)
-- **Target SDK**: 33 (Android 13)
+- **Target SDK**: 34 (Android 14)
 - **Language**: Java
 - **Build System**: Gradle
 
