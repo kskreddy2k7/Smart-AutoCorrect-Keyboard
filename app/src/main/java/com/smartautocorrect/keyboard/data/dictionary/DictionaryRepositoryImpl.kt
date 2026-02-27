@@ -92,6 +92,9 @@ class DictionaryRepositoryImpl @Inject constructor(
         if (maxDist > 0) {
             dict.entries
                 .filter { (dictWord, _) ->
+                    // Early-terminate: if lengths differ by more than maxDist, skip expensive edit distance
+                    val lenDiff = Math.abs(lower.length - dictWord.length)
+                    if (lenDiff > maxDist) return@filter false
                     val dist = LevenshteinUtils.distance(lower, dictWord)
                     dist in 1..maxDist
                 }
