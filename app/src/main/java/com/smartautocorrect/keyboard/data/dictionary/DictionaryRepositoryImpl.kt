@@ -9,6 +9,7 @@ import com.smartautocorrect.keyboard.domain.model.WordSuggestion
 import com.smartautocorrect.keyboard.domain.repository.DictionaryRepository
 import com.smartautocorrect.keyboard.ml.PredictionEngine
 import com.smartautocorrect.keyboard.utils.LevenshteinUtils
+import com.smartautocorrect.keyboard.utils.Trie
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -34,6 +35,9 @@ class DictionaryRepositoryImpl @Inject constructor(
     // Per-language dictionaries: word -> frequency
     private val dictionaries: MutableMap<String, Map<String, Int>> = mutableMapOf()
 
+    // Per-language Trie for fast prefix-based word completion
+    private val tries: MutableMap<String, Trie> = mutableMapOf()
+
     init {
         // Pre-load English dictionary on construction
         loadDictionary("en")
@@ -49,16 +53,22 @@ class DictionaryRepositoryImpl @Inject constructor(
             val filename = "dictionary_$language.json"
             val json = context.assets.open(filename).bufferedReader().use { it.readText() }
             val type = object : TypeToken<Map<String, Int>>() {}.type
-            dictionaries[language] = gson.fromJson(json, type) ?: emptyMap()
+            val dict: Map<String, Int> = gson.fromJson(json, type) ?: emptyMap()
+            dictionaries[language] = dict
+            // Build Trie from the loaded dictionary for fast prefix lookups
+            val trie = Trie()
+            dict.forEach { (word, freq) -> trie.insert(word, freq) }
+            tries[language] = trie
         } catch (e: Exception) {
-            // Fall back to empty map if asset not found
+            // Fall back to empty map/trie if asset not found
             dictionaries[language] = emptyMap()
+            tries[language] = Trie()
         }
     }
 
     override fun isValidWord(word: String): Boolean {
         val lower = word.lowercase()
-        return dictionaries.values.any { it.containsKey(lower) }
+        return tries.values.any { it.contains(lower) }
     }
 
     override suspend fun getSuggestions(
@@ -69,6 +79,7 @@ class DictionaryRepositoryImpl @Inject constructor(
         loadDictionary(language)
         val lower = word.lowercase()
         val dict = dictionaries[language] ?: emptyMap()
+        val trie = tries.getValue(language)
         val maxDist = LevenshteinUtils.maxAllowedDistance(lower.length)
 
         val suggestions = mutableListOf<WordSuggestion>()
@@ -88,32 +99,41 @@ class DictionaryRepositoryImpl @Inject constructor(
             )
         }
 
-        // 3. Levenshtein-based corrections from dictionary
-        if (maxDist > 0) {
-            dict.entries
-                .filter { (dictWord, _) ->
-                    // Early-terminate: if lengths differ by more than maxDist, skip expensive edit distance
-                    val lenDiff = Math.abs(lower.length - dictWord.length)
-                    if (lenDiff > maxDist) return@filter false
-                    val dist = LevenshteinUtils.distance(lower, dictWord)
-                    dist in 1..maxDist
-                }
-                .sortedByDescending { (dictWord, freq) ->
-                    // Rank by combination of similarity and word frequency
-                    val sim = LevenshteinUtils.similarity(lower, dictWord)
-                    sim * 50f + freq * 0.001f
-                }
+        // 3. Prefix-based completions from Trie (efficient O(k) prefix lookup)
+        if (lower.length >= 2) {
+            trie.wordsWithPrefix(lower, limit = 5)
+                .filter { (w, _) -> w != lower }
                 .take(3)
-                .forEach { (dictWord, freq) ->
+                .forEach { (w, freq) ->
+                    if (suggestions.none { it.word == w }) {
+                        suggestions.add(WordSuggestion(w, score = PREFIX_COMPLETION_BASE_SCORE + freq * FREQUENCY_WEIGHT, isAutocorrect = false))
+                    }
+                }
+        }
+
+        // 4. Levenshtein-based corrections from dictionary (calculate distance once per candidate)
+        if (maxDist > 0) {
+            data class Candidate(val word: String, val freq: Int, val dist: Int, val score: Float)
+
+            dict.entries
+                .mapNotNull { (dictWord, freq) ->
+                    val lenDiff = kotlin.math.abs(lower.length - dictWord.length)
+                    if (lenDiff > maxDist) return@mapNotNull null
                     val dist = LevenshteinUtils.distance(lower, dictWord)
-                    val score = (maxDist - dist + 1).toFloat() * 10f + freq * 0.001f
+                    if (dist !in 1..maxDist) return@mapNotNull null
+                    val score = (maxDist - dist + 1).toFloat() * LEVENSHTEIN_SCORE_MULTIPLIER + freq * FREQUENCY_WEIGHT
+                    Candidate(dictWord, freq, dist, score)
+                }
+                .sortedByDescending { it.score }
+                .take(3)
+                .forEach { (dictWord, _, dist, score) ->
                     suggestions.add(
                         WordSuggestion(dictWord, score, isAutocorrect = dist == 1 && lower.length > 3)
                     )
                 }
         }
 
-        // 4. Bigram predictions (add if not already in list)
+        // 5. Bigram predictions (add if not already in list)
         if (!previousWord.isNullOrEmpty()) {
             val bigramSuggestions = predictionEngine.predict(previousWord)
             bigramSuggestions.forEach { sug ->
@@ -144,5 +164,14 @@ class DictionaryRepositoryImpl @Inject constructor(
         language: String
     ): List<WordSuggestion> = withContext(Dispatchers.Default) {
         predictionEngine.predict(previousWord)
+    }
+
+    companion object {
+        /** Base score for prefix-based completions (words that start with the typed prefix). */
+        private const val PREFIX_COMPLETION_BASE_SCORE = 70f
+        /** Score multiplier per edit-distance unit for Levenshtein corrections. */
+        private const val LEVENSHTEIN_SCORE_MULTIPLIER = 10f
+        /** Weight applied to word frequency when computing suggestion scores. */
+        private const val FREQUENCY_WEIGHT = 0.001f
     }
 }
