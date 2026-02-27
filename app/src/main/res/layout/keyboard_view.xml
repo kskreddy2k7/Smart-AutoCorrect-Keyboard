@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.inputmethodservice.KeyboardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/keyboard"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:keyPreviewLayout="@android:layout/simple_list_item_1"
-    android:keyBackground="@android:drawable/btn_default"
-    android:keyTextSize="22sp"
-    android:keyTextColor="#000000"
-    android:verticalCorrection="0px"/>
+    android:orientation="vertical"
+    android:background="#FFECEFF1">
+
+    <!-- Suggestion Bar -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSuggestions"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="#FFE0E0E0"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:orientation="horizontal"
+        android:scrollbars="none"
+        android:clipToPadding="false" />
+
+    <!-- Keyboard View -->
+    <android.inputmethodservice.KeyboardView
+        android:id="@+id/keyboardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:keyPreviewLayout="@android:layout/simple_list_item_1"
+        android:keyBackground="@android:drawable/btn_default"
+        android:keyTextSize="18sp"
+        android:keyTextColor="#FF212121"
+        android:verticalCorrection="0px" />
+
+</LinearLayout>
