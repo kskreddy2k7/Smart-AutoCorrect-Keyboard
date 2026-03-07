@@ -1,0 +1,259 @@
+/* ============================================================
+   Smart AutoCorrect Keyboard – Web App
+   style.css
+   ============================================================ */
+
+/* ── Reset & base ──────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Colour palette */
+  --color-bg:          #f0f4f8;
+  --color-card:        #ffffff;
+  --color-primary:     #4f46e5;      /* indigo */
+  --color-primary-h:   #4338ca;      /* darker indigo on hover */
+  --color-accent:      #06b6d4;      /* cyan */
+  --color-success:     #10b981;      /* green */
+  --color-text:        #1e293b;
+  --color-muted:       #64748b;
+  --color-border:      #e2e8f0;
+  --color-input-focus: #6366f1;
+
+  /* Spacing */
+  --space-xs:  0.25rem;
+  --space-sm:  0.5rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2rem;
+  --space-2xl: 3rem;
+
+  /* Typography */
+  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+  /* Misc */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-input: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --transition: 0.2s ease;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--space-xl) var(--space-md);
+}
+
+/* ── Page header ───────────────────────────────────────────── */
+header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.header-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+h1 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.header-subtitle {
+  margin-top: var(--space-xs);
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 520px;
+}
+
+/* ── Section headings inside the card ─────────────────────── */
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  margin-bottom: var(--space-sm);
+}
+
+/* ── Input section ─────────────────────────────────────────── */
+.input-section {
+  margin-bottom: var(--space-lg);
+}
+
+#wordInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  font-family: var(--font-sans);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: #f8fafc;
+  color: var(--color-text);
+  outline: none;
+  box-shadow: var(--shadow-input);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+#wordInput:focus {
+  border-color: var(--color-input-focus);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+  background: #fff;
+}
+
+#wordInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Divider ───────────────────────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-lg) 0;
+}
+
+/* ── Input-word display ────────────────────────────────────── */
+.input-display-section {
+  margin-bottom: var(--space-lg);
+}
+
+.input-word-display {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: #f1f5f9;
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  display: inline-block;
+  min-width: 3rem;
+}
+
+/* ── Suggestion box ────────────────────────────────────────── */
+.suggestion-section {
+  /* takes remaining space */
+}
+
+#suggestionBox {
+  min-height: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Loading / empty state messages */
+.loading-message,
+.no-suggestion {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+.loading-message.error {
+  color: #ef4444;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ── Result rows ───────────────────────────────────────────── */
+.result-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.result-label {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+/* Word badge shared styles */
+.result-word {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px; /* pill shape */
+}
+
+/* Green badge – word already correct */
+.tag-correct {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* Indigo badge – autocorrected word */
+.tag-suggestion {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+/* Small detail line (edit distance) */
+.edit-detail {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  padding-left: var(--space-xs);
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+footer {
+  margin-top: var(--space-2xl);
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+}
+
+footer a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive tweaks ─────────────────────────────────────── */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: var(--space-lg);
+  }
+
+  #wordInput {
+    font-size: 1rem;
+  }
+}
