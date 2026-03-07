@@ -3,14 +3,133 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ copilot/upgrade-ai-autocorrect-assistant
+  <meta name="description" content="AI-powered autocorrect typing assistant — real-time spell correction with Levenshtein distance, word suggestions, and PWA support." />
+  <meta name="theme-color" content="#6c63ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Smart AutoCorrect Keyboard" />
+  <meta property="og:description" content="AI-powered autocorrect typing assistant running entirely in the browser." />
+  <meta property="og:type" content="website" />
+
+  <title>Smart AutoCorrect Keyboard</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <link rel="apple-touch-icon" href="assets/icon.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+
   <meta name="description" content="Smart AutoCorrect Keyboard – real-time autocorrect powered by edit-distance in the browser." />
 
   <title>Smart AutoCorrect Keyboard</title>
 
   <!-- Link to external stylesheet -->
+ main
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+ copilot/upgrade-ai-autocorrect-assistant
+  <!-- ── Header ── -->
+  <header>
+    <div class="logo-row">
+      <div class="logo-icon" aria-hidden="true">⌨️</div>
+      <h1>Smart AutoCorrect</h1>
+    </div>
+    <p class="tagline">AI-powered typing assistant — real-time corrections in your browser</p>
+    <div class="badge-row">
+      <span class="badge">PWA</span>
+      <span class="badge">Offline</span>
+      <span class="badge">Levenshtein</span>
+      <span class="badge">Open Source</span>
+    </div>
+  </header>
+
+  <!-- ── Main card ── -->
+  <main>
+    <div class="card" role="main">
+
+      <!-- Card header bar -->
+      <div class="card-header">
+        <div class="traffic-lights" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="card-title">autocorrect.ai — typing assistant</span>
+        <div class="status-indicator">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="statusText">Loading…</span>
+        </div>
+      </div>
+
+      <!-- Input area -->
+      <section class="input-section" aria-label="Text input">
+        <div class="input-label">Your text</div>
+        <div class="textarea-wrapper">
+          <textarea
+            id="userInput"
+            placeholder="Type something here… misspelled words will be highlighted and corrected automatically."
+            maxlength="2000"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            aria-label="Type text for autocorrection"
+          ></textarea>
+          <span class="char-count" id="charCount" aria-live="polite">0 / 2000</span>
+        </div>
+      </section>
+
+      <!-- Highlighted preview -->
+      <section class="preview-section" aria-label="Text preview with highlights">
+        <div class="preview-label">Highlighted preview</div>
+        <div id="highlightedText" aria-live="polite" role="region" aria-label="Text with misspellings highlighted"></div>
+      </section>
+
+      <!-- Suggestions panel -->
+      <section class="suggestions-section" aria-label="Autocorrect suggestions">
+        <div class="suggestions-header">Suggestions (click to apply)</div>
+        <div id="suggestionsPanel" role="list" aria-live="polite" aria-label="Word correction suggestions">
+          <span class="no-suggestions">Start typing to get suggestions…</span>
+        </div>
+      </section>
+
+      <!-- Stats bar -->
+      <div class="stats-bar" role="region" aria-label="Statistics">
+        <div class="stat-item">
+          <span class="stat-value" id="statWords">0</span>
+          <span class="stat-label">Words</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="statCorrections">0</span>
+          <span class="stat-label">Corrections</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="statAccuracy">100%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="statDict">…</span>
+          <span class="stat-label">Dictionary</span>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="actions-row">
+        <button class="btn btn-primary" id="copyBtn" aria-label="Copy corrected text">
+          📋 Copy Text
+        </button>
+        <button class="btn btn-ghost" id="clearBtn" aria-label="Clear text area">
+          🗑️ Clear
+        </button>
+      </div>
 
   <!-- ── Page header ────────────────────────────────────────── -->
   <header>
@@ -73,9 +192,56 @@
           <p class="no-suggestion">Start typing above to see a suggestion.</p>
         </div>
       </section>
+ main
 
     </div><!-- /.card -->
   </main>
+
+ copilot/upgrade-ai-autocorrect-assistant
+  <!-- ── Info cards ── -->
+  <section class="info-section" aria-label="How it works">
+    <div class="info-grid">
+
+      <div class="info-card">
+        <div class="info-icon">🧠</div>
+        <h3>Levenshtein Distance</h3>
+        <p>Every word is scored against the dictionary using edit distance — counting insertions, deletions and substitutions needed to transform one word into another.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">⚡</div>
+        <h3>Real-time Suggestions</h3>
+        <p>Corrections appear as you type. Misspelled words are highlighted in red. Click any suggestion chip to instantly replace the word in your text.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">📱</div>
+        <h3>Installable PWA</h3>
+        <p>Add to your home screen on iOS or Android for a native app experience. Works offline after the first load — no backend or internet required.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">🔒</div>
+        <h3>100% Private</h3>
+        <p>All processing happens locally in your browser. Your text is never sent to any server. The dictionary is bundled as a static JSON file.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>
+      Smart AutoCorrect Keyboard &mdash;
+      <a href="https://github.com/kskreddy2k7/Smart-AutoCorrect-Keyboard" target="_blank" rel="noopener">View on GitHub</a>
+      &middot; Open source, MIT licence
+    </p>
+  </footer>
+
+  <!-- ── Toast ── -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
 
   <!-- ── Footer ─────────────────────────────────────────────── -->
   <footer>
@@ -90,5 +256,6 @@
   <!-- Load the autocorrect logic (deferred so the DOM is ready) -->
   <script src="script.js" defer></script>
 
+ main
 </body>
 </html>

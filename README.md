@@ -1,4 +1,7 @@
-# Smart AutoCorrect Keyboard
+# ⌨️ Smart AutoCorrect Keyboard
+
+ copilot/upgrade-ai-autocorrect-assistant
+> **AI-powered autocorrect typing assistant** — runs 100% in the browser via GitHub Pages. No backend, no account, no internet required after first load.
 
 A production-ready Android custom keyboard **and GitHub Pages web app** with intelligent autocorrect powered by edit-distance algorithms.
 
@@ -77,171 +80,167 @@ Edit-distance tolerance (mirrors the Android Kotlin implementation):
 ## 📱 Android App
 
 A production-ready Android custom keyboard with intelligent autocorrect, word suggestions, bigram prediction, and Clean Architecture.
+ main
 
-## Features
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-6c63ff?style=for-the-badge&logo=github)](https://kskreddy2k7.github.io/Smart-AutoCorrect-Keyboard/)
+[![PWA Ready](https://img.shields.io/badge/PWA-Ready-4ade80?style=for-the-badge&logo=pwa)](https://kskreddy2k7.github.io/Smart-AutoCorrect-Keyboard/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-- **Smart AutoCorrect**: Damerau-Levenshtein edit-distance correction with frequency-based ranking
-- **Word Suggestions Bar**: Real-time suggestions (up to 3) shown as you type, with debounced updates
-- **Bigram Prediction**: Next-word prediction based on the previously typed word
-- **Adaptive Learning**: Learns from user typing via Room database — frequently typed words rank higher
-- **Multi-language Support**: English and Hindi (romanized) dictionaries; easily extensible
-- **TFLite Ready**: Optional TensorFlow Lite model integration for enhanced ML predictions
-- **Settings UI**: Configure autocorrect, suggestions, language, and theme via `SettingsActivity`
-- **Clean Architecture**: Domain / Data / UI layers with Hilt DI, MVVM-ready
-- **CI/CD**: GitHub Actions pipeline runs unit tests and builds debug APK on every push
+---
 
-## Architecture
+## ✨ Features
+
+| Feature | Details |
+|---------|---------|
+| 🔴 **Real-time highlighting** | Misspelled words are underlined in red as you type |
+| 💡 **Top 5 suggestions** | Ranked by Levenshtein distance + word frequency |
+| 🖱️ **Click to replace** | Tap any suggestion chip to instantly fix the word |
+| 📊 **Live statistics** | Word count, correction count, accuracy percentage |
+| 📱 **Mobile responsive** | Fluid layout that works on every screen size |
+| 📲 **PWA / Installable** | Add to home screen on iOS & Android |
+| ✈️ **Offline capable** | Service Worker caches all assets after first visit |
+| 🔒 **100% private** | All processing is local — nothing leaves your browser |
+
+---
+
+## 🧠 Algorithm — Levenshtein Distance
+
+The autocorrect engine uses the classic **Levenshtein edit-distance** algorithm to measure how "close" any two words are:
 
 ```
-com.smartautocorrect.keyboard/
-├── SmartKeyboardApplication.kt       # @HiltAndroidApp entry point
-├── domain/
-│   ├── model/
-│   │   ├── WordSuggestion.kt         # Suggestion data class
-│   │   └── UserWord.kt               # Domain model for learned words
-│   ├── repository/
-│   │   └── DictionaryRepository.kt   # Repository interface
-│   └── usecase/
-│       ├── GetSuggestionsUseCase.kt  # Retrieve autocorrect/prediction suggestions
-│       └── LearnWordUseCase.kt       # Record typed words for adaptive learning
-├── data/
-│   ├── database/
-│   │   ├── AppDatabase.kt            # Room database
-│   │   ├── UserWordDao.kt            # DAO for user word frequency
-│   │   └── UserWordEntity.kt         # Room entity
-│   ├── dictionary/
-│   │   └── DictionaryRepositoryImpl.kt  # JSON dict + Levenshtein + bigram impl
-│   └── di/
-│       └── AppModule.kt              # Hilt module (singleton bindings)
-├── ml/
-│   ├── PredictionEngine.kt           # In-memory bigram prediction
-│   └── TFLiteHelper.kt               # Optional TFLite model wrapper
-├── utils/
-│   ├── LevenshteinUtils.kt           # Damerau-Levenshtein distance + similarity
-│   └── ThemeManager.kt               # SharedPreferences-backed theme/settings
-└── ui/
-    ├── keyboard/
-    │   ├── KeyboardService.kt        # @AndroidEntryPoint InputMethodService
-    │   └── SuggestionAdapter.kt      # RecyclerView adapter for suggestion bar
-    └── settings/
-        └── SettingsActivity.kt       # Preference-based settings screen
+distance(a, b) = minimum number of single-character edits
+                 (insertions · deletions · substitutions)
+                 required to transform a into b
 ```
 
-## Project Structure
+### Tolerance table
+
+| Word length | Max allowed distance |
+|-------------|----------------------|
+| ≤ 3         | 0 — no correction    |
+| 4 – 5       | 1                    |
+| 6 – 8       | 2                    |
+| ≥ 9         | 3                    |
+
+Suggestions are ranked by a combined score:
+
+```
+score = distance − log₂(frequency) × 0.1
+```
+
+Lower score = better suggestion. This ensures that common words rank ahead of rare words at the same edit distance.
+
+### Time complexity
+
+| Step | Complexity |
+|------|-----------|
+| Single pair comparison | O(m × n) where m, n are word lengths |
+| Dictionary scan | O(D × m × n) — optimised with length pre-filter |
+| Length pre-filter | Skips any dict word whose length differs by > maxDist |
+
+---
+
+## 📁 Project Structure
 
 ```
 Smart-AutoCorrect-Keyboard/
-├── app/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── assets/
-│   │   │   │   ├── dictionary_en.json        # English word frequency dict
-│   │   │   │   └── dictionary_hi.json        # Hindi romanized dict
-│   │   │   ├── java/com/smartautocorrect/keyboard/   # Kotlin sources (see above)
-│   │   │   ├── res/
-│   │   │   │   ├── layout/
-│   │   │   │   │   ├── keyboard_view.xml     # Keyboard + suggestion bar
-│   │   │   │   │   ├── item_suggestion.xml   # Individual suggestion chip
-│   │   │   │   │   └── activity_settings.xml # Settings host layout
-│   │   │   │   ├── values/
-│   │   │   │   │   ├── strings.xml
-│   │   │   │   │   └── arrays.xml            # Language/theme option arrays
-│   │   │   │   └── xml/
-│   │   │   │       ├── keyboard_layout.xml   # QWERTY key definitions
-│   │   │   │       ├── keyboard_preferences.xml  # Preference screen XML
-│   │   │   │       └── method.xml            # IME metadata
-│   │   │   └── AndroidManifest.xml
-│   │   └── test/                             # JUnit unit tests
-│   ├── build.gradle
-│   └── proguard-rules.pro
-├── scripts/
-│   └── train_bigram_model.py         # Offline bigram training script
-├── .github/workflows/android.yml     # CI pipeline
-├── build.gradle
-├── settings.gradle
-└── gradle.properties
+├── index.html        ← Single-page app shell
+├── style.css         ← Dark-theme responsive styles
+├── script.js         ← Levenshtein engine + UI logic
+├── words.json        ← 500+ word dictionary
+├── manifest.json     ← PWA manifest
+├── sw.js             ← Service Worker (offline support)
+├── assets/
+│   └── icon.png      ← App icon (192 × 192)
+└── README.md
 ```
 
-## Building the Project
+---
 
-### Prerequisites
+## 🚀 GitHub Pages Deployment
 
-- Android Studio Hedgehog (2023.1.1) or later
-- JDK 17
-- Android SDK API Level 24+
+### One-click setup
 
-### Build Steps
+1. Fork or clone this repository
+2. Go to **Settings → Pages**
+3. Under *Source*, choose **Deploy from a branch**
+4. Select branch `main` (or your default branch) and folder `/ (root)`
+5. Click **Save**
+
+Your app will be live at:
+```
+https://<your-username>.github.io/Smart-AutoCorrect-Keyboard/
+```
+
+### Local development
+
+No build step required — just open `index.html` in a browser:
 
 ```bash
-git clone https://github.com/kskreddy2k7/Smart-AutoCorrect-Keyboard.git
-cd Smart-AutoCorrect-Keyboard
-./gradlew assembleDebug
+# Option 1: Python simple server (recommended — needed for fetch() + SW)
+python3 -m http.server 8080
+# Then open http://localhost:8080
+
+# Option 2: Node.js
+npx serve .
 ```
 
-### Run Unit Tests
+> ⚠️ **Important:** Open via `http://localhost:…` rather than `file://` so that `fetch('words.json')` and the Service Worker work correctly.
 
-```bash
-./gradlew test
+---
+
+## 📸 Screenshots
+
+### Desktop view
+The main card with real-time highlighted preview and suggestion chips:
+
+```
+┌─────────────────────────────────────────────┐
+│  ● ● ●    autocorrect.ai — typing assistant  │
+├─────────────────────────────────────────────┤
+│  YOUR TEXT                                   │
+│  ┌───────────────────────────────────────┐  │
+│  │ Teh quik brwon fox jmps over the…     │  │
+│  └───────────────────────────────────────┘  │
+│  HIGHLIGHTED PREVIEW                         │
+│  [Teh] [quik] [brwon] fox [jmps] over the… │
+│  SUGGESTIONS                                 │
+│  [① the d=1] [② ten d=2] [③ tea d=2]       │
+├──────┬──────┬──────┬────────────────────────┤
+│  12  │  4   │  67% │  550                   │
+│ Words│Fixes │Accur.│ Dict                   │
+└──────┴──────┴──────┴────────────────────────┘
 ```
 
-## Installation
+---
 
-1. Build and install the APK on your Android device
-2. Go to **Settings → System → Languages & Input → Virtual Keyboard**
-3. Enable **Smart AutoCorrect Keyboard**
-4. Select it when typing in any app
-5. Access keyboard settings via the settings gear icon
+## 🛠️ Customising the Dictionary
 
-## Bigram Model Training
+`words.json` is a plain JSON array of strings. Add your own domain-specific terms:
 
-Generate a bigram model from your own text corpus:
-
-```bash
-# Demo mode (uses built-in sample corpus)
-python scripts/train_bigram_model.py --demo
-
-# Custom corpus
-python scripts/train_bigram_model.py --input my_corpus.txt --output bigrams.json --min-count 3
+```json
+{
+  "words": [
+    "javascript", "typescript", "react", "your-custom-term",
+    ...
+  ]
+}
 ```
 
-Place the resulting `bigrams.json` in `app/src/main/assets/` and load it via `PredictionEngine.loadBigrams()`.
+The engine will deduplicate and sort the list automatically at load time.
 
-## TFLite Integration
+---
 
-To enable ML-based next-word prediction:
+## 🤝 Contributing
 
-1. Train or obtain a TFLite next-word prediction model
-2. Place the model file at `app/src/main/assets/keyboard_model.tflite`
-3. Implement inference logic in `TFLiteHelper.predict()`
+Pull requests are welcome! Please open an issue first to discuss what you would like to change.
 
-`TFLiteHelper` automatically detects the model at startup. If absent, the app gracefully falls back to the bigram rule-based model.
+---
 
-## Technical Details
+## 📄 Licence
 
-| Property | Value |
-|---|---|
-| Language | Kotlin |
-| Min SDK | 24 (Android 7.0) |
-| Target SDK | 34 (Android 14) |
-| Architecture | Clean Architecture (Domain/Data/UI) |
-| DI | Hilt 2.50 |
-| Database | Room 2.6.1 |
-| Coroutines | 1.7.3 |
-| Build System | Gradle 8.2.2 |
+This project is open source and available under the [MIT Licence](LICENSE).
 
-## Autocorrect Algorithm
+---
 
-`LevenshteinUtils` computes Damerau-Levenshtein distance (insertions, deletions, substitutions, and adjacent transpositions). Edit-distance tolerance scales with word length:
-
-| Word Length | Max Allowed Distance |
-|---|---|
-| ≤ 3 | 0 (no correction) |
-| 4–5 | 1 |
-| 6–8 | 2 |
-| ≥ 9 | 3 |
-
-Suggestions are ranked by a combined score of edit similarity and word frequency.
-
-## License
-
-This project is open source and available for educational purposes.
+<p align="center">Made with ❤️ — runs 100% in your browser</p>
