@@ -1,0 +1,21 @@
+{
+  "name": "Smart AutoCorrect Keyboard",
+  "short_name": "AutoCorrect",
+  "description": "AI-powered autocorrect typing assistant that runs entirely in the browser",
+  "start_url": "/Smart-AutoCorrect-Keyboard/",
+  "scope": "/Smart-AutoCorrect-Keyboard/",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#6c63ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": []
+}
