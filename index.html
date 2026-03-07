@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ copilot/upgrade-ai-autocorrect-assistant
   <meta name="description" content="AI-powered autocorrect typing assistant — real-time spell correction with Levenshtein distance, word suggestions, and PWA support." />
   <meta name="theme-color" content="#6c63ff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -25,10 +26,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+
+  <meta name="description" content="Smart AutoCorrect Keyboard – real-time autocorrect powered by edit-distance in the browser." />
+
+  <title>Smart AutoCorrect Keyboard</title>
+
+  <!-- Link to external stylesheet -->
+ main
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+ copilot/upgrade-ai-autocorrect-assistant
   <!-- ── Header ── -->
   <header>
     <div class="logo-row">
@@ -122,9 +131,73 @@
         </button>
       </div>
 
+  <!-- ── Page header ────────────────────────────────────────── -->
+  <header>
+    <span class="header-icon" aria-hidden="true">⌨️</span>
+    <h1>Smart AutoCorrect Keyboard</h1>
+    <p class="header-subtitle">Real-time autocorrect powered by edit-distance — runs entirely in your browser</p>
+  </header>
+
+  <!-- ── Main card ──────────────────────────────────────────── -->
+  <main>
+    <div class="card">
+
+      <!-- Input section -->
+      <section class="input-section">
+        <p class="section-label">Type a word</p>
+
+        <!--
+          Text box where the user types.
+          Disabled until the dictionary is loaded (JS enables it).
+          The `input` event fires on every keystroke, triggering autocorrect.
+        -->
+        <input
+          type="text"
+          id="wordInput"
+          placeholder="e.g. helo, wrold, teh …"
+          autocomplete="off"
+          spellcheck="false"
+          disabled
+          aria-label="Type a word to autocorrect"
+        />
+
+        <!-- Shown while dictionary.json is being fetched -->
+        <p id="loadingMessage" class="loading-message" role="status">
+          ⏳ Loading dictionary…
+        </p>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- Input word display -->
+      <section class="input-display-section">
+        <p class="section-label">Input Word</p>
+        <!--
+          Reflects exactly what the user typed (updated by JS).
+          Shows an em-dash when empty.
+        -->
+        <span id="inputDisplay" class="input-word-display" aria-live="polite">—</span>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- Suggestion section -->
+      <section class="suggestion-section">
+        <p class="section-label">Suggested Correction</p>
+        <!--
+          Populated by JS with the best dictionary match.
+          Shows a message while the user hasn't typed anything yet.
+        -->
+        <div id="suggestionBox" role="region" aria-live="polite" aria-label="Autocorrect suggestion">
+          <p class="no-suggestion">Start typing above to see a suggestion.</p>
+        </div>
+      </section>
+ main
+
     </div><!-- /.card -->
   </main>
 
+ copilot/upgrade-ai-autocorrect-assistant
   <!-- ── Info cards ── -->
   <section class="info-section" aria-label="How it works">
     <div class="info-grid">
@@ -169,5 +242,20 @@
   <div id="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js"></script>
+
+  <!-- ── Footer ─────────────────────────────────────────────── -->
+  <footer>
+    <p>
+      Smart AutoCorrect Keyboard &mdash;
+      <a href="https://github.com/kskreddy2k7/Smart-AutoCorrect-Keyboard" target="_blank" rel="noopener noreferrer">
+        View on GitHub
+      </a>
+    </p>
+  </footer>
+
+  <!-- Load the autocorrect logic (deferred so the DOM is ready) -->
+  <script src="script.js" defer></script>
+
+ main
 </body>
 </html>
