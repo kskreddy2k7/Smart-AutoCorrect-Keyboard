@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Smart AutoCorrect Keyboard – real-time autocorrect powered by edit-distance in the browser." />
+
+  <title>Smart AutoCorrect Keyboard</title>
+
+  <!-- Link to external stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Page header ────────────────────────────────────────── -->
+  <header>
+    <span class="header-icon" aria-hidden="true">⌨️</span>
+    <h1>Smart AutoCorrect Keyboard</h1>
+    <p class="header-subtitle">Real-time autocorrect powered by edit-distance — runs entirely in your browser</p>
+  </header>
+
+  <!-- ── Main card ──────────────────────────────────────────── -->
+  <main>
+    <div class="card">
+
+      <!-- Input section -->
+      <section class="input-section">
+        <p class="section-label">Type a word</p>
+
+        <!--
+          Text box where the user types.
+          Disabled until the dictionary is loaded (JS enables it).
+          The `input` event fires on every keystroke, triggering autocorrect.
+        -->
+        <input
+          type="text"
+          id="wordInput"
+          placeholder="e.g. helo, wrold, teh …"
+          autocomplete="off"
+          spellcheck="false"
+          disabled
+          aria-label="Type a word to autocorrect"
+        />
+
+        <!-- Shown while dictionary.json is being fetched -->
+        <p id="loadingMessage" class="loading-message" role="status">
+          ⏳ Loading dictionary…
+        </p>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- Input word display -->
+      <section class="input-display-section">
+        <p class="section-label">Input Word</p>
+        <!--
+          Reflects exactly what the user typed (updated by JS).
+          Shows an em-dash when empty.
+        -->
+        <span id="inputDisplay" class="input-word-display" aria-live="polite">—</span>
+      </section>
+
+      <hr class="divider" />
+
+      <!-- Suggestion section -->
+      <section class="suggestion-section">
+        <p class="section-label">Suggested Correction</p>
+        <!--
+          Populated by JS with the best dictionary match.
+          Shows a message while the user hasn't typed anything yet.
+        -->
+        <div id="suggestionBox" role="region" aria-live="polite" aria-label="Autocorrect suggestion">
+          <p class="no-suggestion">Start typing above to see a suggestion.</p>
+        </div>
+      </section>
+
+    </div><!-- /.card -->
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────── -->
+  <footer>
+    <p>
+      Smart AutoCorrect Keyboard &mdash;
+      <a href="https://github.com/kskreddy2k7/Smart-AutoCorrect-Keyboard" target="_blank" rel="noopener noreferrer">
+        View on GitHub
+      </a>
+    </p>
+  </footer>
+
+  <!-- Load the autocorrect logic (deferred so the DOM is ready) -->
+  <script src="script.js" defer></script>
+
+</body>
+</html>
